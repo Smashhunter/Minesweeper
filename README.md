@@ -25,6 +25,7 @@ Game supposed to be runned in console without additional parametrs. (Can change 
 
 Now build is tested only on Linux systems (Debian-based).
 That means probably all dependencies already installed in your sysyem so you can write this:
+
 ``` bash
 #debug compilation
 make
@@ -37,7 +38,7 @@ make static
 
 ## Additional features (in plans)
 
-[ ] Coloring
-[ ] Score system
-[ ] Difficulty levels
-[ ] Windows build
+- [ ] Coloring
+- [ ] Score system
+- [ ] Difficulty levels
+- [ ] Windows build
