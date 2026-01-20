@@ -1,0 +1,35 @@
+name: Manual Release Build
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Версия релиза (например: v1.0.0)'
+        required: true
+        type: string
+      release_notes:
+        description: 'Примечания к релизу'
+        required: false
+        type: string
+        default: 'Релиз создан через GitHub Actions'
+
+jobs:
+  build-ubuntu:
+    runs-on: ubuntu-latest
+    permissions: write-all
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build
+        run: |
+          make dist
+
+      - name: Upload Release Asset
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create "${{ github.event.inputs.version }}" \
+            --title "Release ${{ github.event.inputs.version }}" \
+            --notes "${{ github.event.inputs.release_notes }}"
+          
+          gh release upload "${{ github.event.inputs.version }}" dist/*.tar.gz
