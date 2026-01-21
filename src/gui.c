@@ -18,23 +18,28 @@ void init_color_pairs()
 
 void draw_field(const Game *game)
 {
+    clear();
     for(int i = 0; i < game -> rows; ++i){
         for(int j = 0; j < game -> cols; ++j){
             move(i, j);
             
-            if(game->field[i][j] > '0' && game->field[i][j] < '9'){
-                attrset(COLOR_PAIR(game->field[i][j] - '0'));
-                addch(game->field[i][j]);
-            } else if(game->field[i][j] == '0') {
+            if(game->fogged[i][j] > '0' && game->fogged[i][j] < '9'){
+                attrset(COLOR_PAIR(game->fogged[i][j] - '0'));
+                addch(game->fogged[i][j]);
+            } else if(game->fogged[i][j] == '0') {
                 attrset(A_DIM | COLOR_PAIR(0));
-                addch('.');
-            } else if (game->field[i][j] == 'b') {
+                addch(' ');
+            } else if (game->fogged[i][j] == 'b') {
                 attrset(A_BOLD | COLOR_PAIR(9) | A_BLINK);
-                addch(game->field[i][j]);
-            } else if (game->field[i][j] == 'f') {
+                addch(game->fogged[i][j]);
+            } else if (game->fogged[i][j] == 'f') {
                 attrset(A_BOLD | COLOR_PAIR(10));
-                addch(game->field[i][j]);
+                addch(game->fogged[i][j]);
+            } else if (game->fogged[i][j] == '?') {
+                attrset(A_DIM | COLOR_PAIR(0));
+                addch(game->fogged[i][j]);
             }
         }
     }
+    refresh();
 }

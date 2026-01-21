@@ -14,12 +14,15 @@ Game supposed to be runned in console without additional parametrs. (Can change 
 ## Controls
 
 - Arrows = move cursor
-- Space = add flag to selected cell
-- Enter = Open *safe* cell
+- x = add flag to selected cell
+- z = Open *safe* cell
 
 ## Symbols
 
-// TODO: Document symbols
+- b - bomb/mine
+- ? - unckown symbol
+- f - flag
+- [1..9] - obviously number of connected with this cell bombs
 
 ## Building
 
@@ -38,7 +41,7 @@ make static
 
 ## Additional features (in plans)
 
-- [ ] Coloring
+- [x] Coloring
 - [ ] Score system
 - [ ] Difficulty levels
 - [ ] Windows build
