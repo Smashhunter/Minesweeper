@@ -16,8 +16,15 @@ typedef struct{
     int cols;
 } Game; 
 
+typedef struct 
+{
+    int x;
+    int y;
+} point;
+
+
 // Field supposed to be 2-d char array filled with '\0' chars
 void init_field(Game *game); /* Not supposed to resize array of field*/
-void make_move(Game *game, int x, int y, enum move_type mt);
+void make_move(Game *game, point move_cords, enum move_type mt);
 
 #endif

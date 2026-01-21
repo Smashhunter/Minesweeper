@@ -1,13 +1,9 @@
 #include "mine_field.h"
 
-typedef struct 
-{
-    int x;
-    int y;
-} point;
+#include <stdio.h>
 
-static int is_availble_to_add(const Game *game, int x, int y)
-{
+static int is_available_to_add(const Game *game, int x, int y)
+{                   
     // Out of boundary check
     if(x >= game->cols || x < 0)
         return 0;
@@ -23,48 +19,52 @@ static int is_availble_to_add(const Game *game, int x, int y)
 // Auxiliary function to add numbers to field
 static void add_around_mines(Game *game, point mine)
 {
-    int max_x =  mine.x+1, max_y = mine.y+1;
-    for(int temp_y = mine.y-1; temp_y <= max_y; ++temp_y)
+    // Process all cell around mine with 3x3 square
+    fprintf(stderr, "Processing mine at (%d, %d)\n", mine.x, mine.y);
+    for(int temp_y = mine.y - 1; temp_y <= mine.y + 1; ++temp_y)
     {
-        for(int temp_x = mine.x-1; temp_x <= max_x; ++temp_x){
-            if(is_availble_to_add(game, temp_x, temp_y))
+        for(int temp_x = mine.x - 1; temp_x <= mine.x + 1; ++temp_x)
+        {
+            if(is_available_to_add(game, temp_x, temp_y)){
+                fprintf(stderr, "  Incrementing cell (%d, %d)\n", temp_x, temp_y);
                 game->field[temp_y][temp_x]++;
+            }
         }
     }
-
 }
-
 void init_field(Game *game)
 {
     int number_of_cells = game->rows * game->cols;
     int number_of_mines = number_of_cells * 20 / 100; // = * 20%
 
+    // Get mines cords using Ficher-Yets algorithm
     point *mines_cords = malloc(number_of_mines * sizeof(*mines_cords));
-    int n = number_of_mines; // Buffered for while cycle
-    int i = 0;
-    point temp;
-    while (n)
-    {
-        temp.x = rand() % game->cols;
-        temp.y = rand() % game->rows;
-        // Check dublicates
-        for(int j = 0; j < i; ++j){
-            if(temp.x == mines_cords[j].x && temp.y == mines_cords[j].y)
-                continue;
-        }
-        mines_cords[i] = temp;
-        ++i;
-        --n;
+    
+    // First number_of_mines cords
+    for (int i = 0; i < number_of_mines; i++) {
+        mines_cords[i].x = i % game->cols;
+        mines_cords[i].y = i / game->cols;
     }
+
+    // Replace with random cords
+    for (int i = number_of_mines; i < number_of_cells; i++) {
+        int r = rand() % (i + 1);
+    
+        if (r < number_of_mines) {
+            mines_cords[r].x = i % game->cols;
+            mines_cords[r].y = i / game->cols;
+        }
+    }
+
     // Fill with nums and bombs
-    for(i = 0; i < number_of_mines; ++i){
+    for(int i = 0; i < number_of_mines; ++i){
         game->field[mines_cords[i].y][mines_cords[i].x] = 'b';
-        add_around_mines(game, mines_cords[i]);
+        add_around_mines(game, mines_cords[i]); // Дублирование здесь так как в списке оказалась копия мины
     }
     free(mines_cords);
 
     // Create invariant of field
-    for(i = 0; i < game->rows; ++i){
+    for(int i = 0; i < game->rows; ++i){
         for(int j = 0; j < game->cols; ++j){
             if(game->field[i][j] != 'b')
                 game->field[i][j] += '0';
@@ -73,7 +73,8 @@ void init_field(Game *game)
     
 }
 
-void make_move(Game *game, int x, int y, enum move_type mt)
+void make_move(Game *game, point move_cords, enum move_type mt)
 {
     return;
 }
+
