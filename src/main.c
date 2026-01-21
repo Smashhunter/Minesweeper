@@ -2,6 +2,26 @@
 #include <memory.h>
 
 #include "mine_field.h"
+#include "gui.h"
+
+enum { key_escape = 27 };
+
+static void check(int *coord, int max)
+{
+    if(*coord < 0)
+        *coord+=max;
+    else if (*coord > max)
+        *coord -= max;
+}
+
+void move_cursor(const Game *game, point *cursor_pos, int dx, int dy)
+{
+    cursor_pos->x += dx;
+    check(&cursor_pos->x, game->cols);
+    cursor_pos->y += dy;
+    check(&cursor_pos->y, game->rows);
+    move(cursor_pos->y, cursor_pos->x);
+}
 
 int main()
 {
@@ -9,10 +29,15 @@ int main()
 
     if(!has_colors()){
         endwin();
-        fprintf(stderr, "Your terminal dont support coloring!");
+        fprintf(stderr, "Your terminal doesn't support coloring!");
         return 1;
     }
     start_color();
+
+    cbreak();
+    keypad(stdscr, 1);
+    noecho();
+    
 
     // init game field
     Game game;
@@ -23,40 +48,32 @@ int main()
     }
     init_field(&game);
 
-    //Init color pairs for bombs and flags;
-    init_pair(1, COLOR_BLUE, COLOR_BLACK); // for ones, two's and so on
-    init_pair(2, COLOR_GREEN, COLOR_BLACK);
-    init_pair(3, COLOR_RED, COLOR_BLACK);
-    init_pair(4, COLOR_BLUE, COLOR_BLACK);
-    init_pair(5, COLOR_RED, COLOR_BLACK);
-    init_pair(6, COLOR_CYAN, COLOR_BLACK);
-    init_pair(7, COLOR_MAGENTA, COLOR_BLACK);
-    init_pair(8, COLOR_WHITE, COLOR_BLACK);
-    init_pair(9, COLOR_BLACK, COLOR_WHITE); // for bombs
-    init_pair(10,COLOR_BLACK, COLOR_GREEN); // for flags
+    init_color_pairs();
 
-    //Draw full field
-    for(int i = 0; i < game.rows; ++i){
-        for(int j = 0; j < game.cols; ++j){
-            move(i, j);
-            
-            if(game.field[i][j] > '0' && game.field[i][j] < '9'){
-                attrset(COLOR_PAIR(game.field[i][j] - '0'));
-                addch(game.field[i][j]);
-            } else if(game.field[i][j] == '0') {
-                attrset(A_DIM | COLOR_PAIR(0));
-                addch('.');
-            } else if (game.field[i][j] == 'b') {
-                attrset(A_BOLD | COLOR_PAIR(9));
-                addch(game.field[i][j]);
-            } else if (game.field[i][j] == 'f') {
-                attrset(A_BOLD | COLOR_PAIR(10));
-                addch(game.field[i][j]);
-            }
+    draw_field(&game);
+    curs_set(2);
+
+    int key;
+    // Cords for cursor point
+    point cur_cords = {game.cols / 2, game.rows / 2};
+    move(cur_cords.y, cur_cords.x);
+    while((key = getch()) != key_escape){
+        switch (key){
+        case KEY_UP:
+            move_cursor(&game, &cur_cords, 0, -1);
+            break;
+        case KEY_DOWN:
+            move_cursor(&game, &cur_cords, 0, 1);
+            break;
+        case KEY_LEFT:
+            move_cursor(&game, &cur_cords, -1, 0);
+            break;
+        case KEY_RIGHT:
+            move_cursor(&game, &cur_cords, 1, 0);
+            break;
         }
+        refresh();
     }
-    refresh();
-    getch();
     endwin();
     return 0;
 }
