@@ -155,10 +155,9 @@ static enum gamestate check_win(const Game *game){
 
 }
 
-// TODO: Realese logic
 enum gamestate make_move(Game *game, point move_cords, enum move_type mt)
 {   
-    enum gamestate move_result;
+    enum gamestate move_result = CONTINUE;
     if (mt == enter_cell) {
         move_result = handle_enter_cell(game, move_cords);
     }
